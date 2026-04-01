@@ -1,111 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Memory Reconstruction</title>
+<meta charset="UTF-8" />
+<title>Digital Doppelgänger</title>
 
 <style>
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #0f0f0f;
-    color: white;
-    text-align: center;
-    padding: 50px;
-    transition: 0.5s;
+  margin: 0;
+  background: #0e0e0e;
+  color: white;
+  font-family: "Segoe UI", sans-serif;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.panel {
+  flex: 1;
+  padding: 40px;
+  transition: 0.5s;
+}
+
+#you {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+}
+
+#doppel {
+  background: linear-gradient(135deg, #000000, #3a0ca3);
+}
+
+h2 {
+  text-align: center;
+  opacity: 0.9;
 }
 
 textarea {
-    width: 60%;
-    height: 120px;
-    padding: 15px;
-    border-radius: 10px;
-    border: none;
-    outline: none;
-    font-size: 16px;
+  width: 90%;
+  height: 120px;
+  padding: 15px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 16px;
 }
 
 button {
-    margin-top: 20px;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 20px;
-    background: #ff4d6d;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
+  margin-top: 15px;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 20px;
+  background: #ff006e;
+  color: white;
+  cursor: pointer;
 }
 
-#output {
-    margin-top: 40px;
-    font-size: 20px;
-    min-height: 80px;
+.response {
+  margin-top: 20px;
+  font-size: 18px;
+  min-height: 80px;
 }
 
-#confidence {
-    margin-top: 20px;
-    font-size: 14px;
-    opacity: 0.7;
+#conflict {
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.8;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🧠 Memory Reconstruction</h1>
-<p>Write a memory. Watch it change.</p>
+<div class="panel" id="you">
+  <h2>🧍 You</h2>
+  <textarea id="input" placeholder="Type what you're thinking..."></textarea><br>
+  <button onclick="think()">Think</button>
+  <div class="response" id="youResponse"></div>
+</div>
 
-<textarea id="memoryInput" placeholder="Type your memory here..."></textarea>
-<br>
-<button onclick="reconstruct()">Reconstruct</button>
+<div class="panel" id="doppel">
+  <h2>👤 Doppelgänger</h2>
+  <div class="response" id="doppelResponse"></div>
+</div>
 
-<div id="output"></div>
-<div id="confidence"></div>
+<div id="conflict">Conflict Level: 0%</div>
 
 <script>
-const wordsMap = {
-    "happy": ["uncertain", "strange", "distant"],
-    "friend": ["someone", "a stranger", "a shadow"],
-    "school": ["place", "building", "somewhere"],
-    "love": ["attachment", "illusion", "habit"],
-    "day": ["moment", "time", "blur"]
+let conflict = 0;
+
+const distortions = {
+  "i": "you",
+  "am": "pretend to be",
+  "happy": "uncertain",
+  "sad": "comfortable in sadness",
+  "alone": "finally free",
+  "love": "dependency",
+  "trust": "weakness",
+  "fear": "truth",
+  "safe": "trapped"
 };
 
-function distortWord(word) {
+function distortText(text) {
+  return text.split(" ").map(word => {
     let lower = word.toLowerCase();
-    if (wordsMap[lower]) {
-        let options = wordsMap[lower];
-        return options[Math.floor(Math.random() * options.length)];
-    }
-    return word;
+    return distortions[lower] || word;
+  }).join(" ");
 }
 
-function reconstruct() {
-    let input = document.getElementById("memoryInput").value;
-    let words = input.split(" ");
-    let output = document.getElementById("output");
-    let confidence = document.getElementById("confidence");
+function think() {
+  let input = document.getElementById("input").value;
+  if (!input) return;
 
-    output.innerText = "";
-    let index = 0;
+  document.getElementById("youResponse").innerText =
+    "You: " + input;
 
-    let interval = setInterval(() => {
-        if (index < words.length) {
-            let changed = Math.random() < 0.4 ? distortWord(words[index]) : words[index];
-            output.innerText += changed + " ";
-            index++;
+  let altered = distortText(input);
 
-            // color shift
-            document.body.style.background = `rgb(${20 + index*3}, 10, 20)`;
+  document.getElementById("doppelResponse").innerText =
+    "Doppelgänger: " + altered;
 
-            // confidence drop
-            let conf = Math.max(0, 100 - index * 5);
-            confidence.innerText = "Memory Confidence: " + conf + "%";
+  conflict = Math.min(100, conflict + Math.floor(Math.random() * 15) + 5);
+  document.getElementById("conflict").innerText =
+    "Conflict Level: " + conflict + "%";
 
-        } else {
-            clearInterval(interval);
-            confidence.innerText += "  |  Reconstruction Complete.";
-        }
-    }, 300);
+  if (conflict > 60) {
+    document.body.style.filter = "contrast(120%) saturate(140%)";
+  }
+  if (conflict > 85) {
+    document.getElementById("doppelResponse").innerText +=
+      "\n\nAre you sure you're the real one?";
+  }
 }
 </script>
 
